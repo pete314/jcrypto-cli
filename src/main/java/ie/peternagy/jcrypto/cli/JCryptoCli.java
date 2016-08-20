@@ -27,9 +27,11 @@ import ie.peternagy.jcrypto.algo.EllipticCurveWrapper;
 import ie.peternagy.jcrypto.util.CryptoSecurityUtil;
 import ie.peternagy.jcrypto.util.FileAcccessUtil;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.Security;
 import java.util.Enumeration;
+import javax.crypto.Cipher;
 import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
@@ -39,16 +41,17 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  */
 public class JCryptoCli {
 
-    public static void main(String[] args) {
-        Security.addProvider(new BouncyCastleProvider());
-        Security.getProvider("BC");
-        System.out.println(FileAcccessUtil.getUserHome(true));
-        EllipticCurveWrapper ec = new EllipticCurveWrapper();
-        //ec.generateKeys();
-        ec.tryLoadKeys();
-        byte[] b = CryptoSecurityUtil.getSecureBytes(50);
-        byte[] c = ec.doFinal(b, true);
-        System.out.println("in " + Hex.encodeHexString(b));
-        System.out.println("in " + Hex.encodeHexString(c));
+    public static void main(String[] args) throws NoSuchAlgorithmException {
+        System.out.println("key " + Cipher.getMaxAllowedKeyLength("AES"));
+//        Security.addProvider(new BouncyCastleProvider());
+//        Security.getProvider("BC");
+//        System.out.println(FileAcccessUtil.getUserHome(true));
+//        EllipticCurveWrapper ec = new EllipticCurveWrapper();
+//        //ec.generateKeys();
+//        ec.tryLoadKeys();
+//        byte[] b = CryptoSecurityUtil.getSecureBytes(50);
+//        byte[] c = ec.doFinal(b, true);
+//        System.out.println("in " + Hex.encodeHexString(b));
+//        System.out.println("in " + Hex.encodeHexString(c));
     }
 }
