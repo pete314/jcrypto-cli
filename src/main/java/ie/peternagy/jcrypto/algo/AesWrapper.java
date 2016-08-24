@@ -48,7 +48,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 public class AesWrapper {
 
     private final String KEYGEN_ALGORITHM = "PBKDF2WithHmacSHA512";
-    private final String CIPHER_ALGORITHM = "AES/OCB/NoPadding";
+    private final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
     private final EllipticCurveWrapper curve;
     private Cipher cipher;
     private SecretKey secretKey;
@@ -62,7 +62,7 @@ public class AesWrapper {
         Security.addProvider(new BouncyCastleProvider());
         Security.getProvider("BC");
         this.curve = curve;
-        iv = CryptoSecurityUtil.getSecureBytes(15);
+        iv = CryptoSecurityUtil.getSecureBytes(16);
         salt = CryptoSecurityUtil.getSecureBytes(16);
         baseKey = CryptoSecurityUtil.getSecureBytes(64);
         generateSecretKey();
@@ -153,18 +153,18 @@ public class AesWrapper {
     protected byte[] createHeader() {
         try {
             byte[] garbageByte = CryptoSecurityUtil.getSecureBytes(CryptoSecurityUtil.getRandomIntInRange(0, 768));
-
+            byte[] baseKeyEnc = curve.doFinalWithHeader(baseKey, true);
             ByteArrayOutputStream header = new ByteArrayOutputStream();
 
             header.write((byte) 100);
             header.write(ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(iv.length).array());
             header.write(ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(salt.length).array());
             header.write(ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(garbageByte.length).array());
-            header.write(ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(baseKey.length).array());
+            header.write(ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(baseKeyEnc.length).array());
             header.write(iv);
             header.write(salt);
             header.write(garbageByte);
-            header.write(curve.doFinalWithHeader(baseKey, true));//encrypt with EC
+            header.write(baseKeyEnc);//encrypt with EC
             //include: long and crc32 for data
 
             return header.toByteArray();

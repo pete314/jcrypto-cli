@@ -68,6 +68,7 @@ public class EllipticCurveWrapper {
     public EllipticCurveWrapper() {
         Security.addProvider(new BouncyCastleProvider());
         try {
+            tryLoadKeys();
             ecCipher = Cipher.getInstance(ALGORITHM_NAME, "BC");
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | NoSuchProviderException ex) {
             Logger.getLogger(EllipticCurveWrapper.class.getName()).log(Level.SEVERE, null, ex);
@@ -118,7 +119,7 @@ public class EllipticCurveWrapper {
         if (isEncrypt) {
             byte[] outData = doFinal(data, true);
             byte[] rawHeader = createRawHeader(CryptoSignatureUtil.calculateCrc32(outData));
-
+            
             return ArrayUtils.addAll(rawHeader, outData);
         }else{
             byte[] content = extractRawHeader(data);
@@ -141,7 +142,7 @@ public class EllipticCurveWrapper {
             header.write(ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(keyId.length).array());//key id length
             header.write(ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(dataCrc).array());
             header.write(keyId);
-
+            
             return header.toByteArray();
         } catch (IOException ex) {
             Logger.getLogger(EllipticCurveWrapper.class.getName()).log(Level.SEVERE, null, ex);

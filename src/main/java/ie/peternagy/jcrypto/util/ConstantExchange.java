@@ -25,6 +25,6 @@ package ie.peternagy.jcrypto.util;
 
 public class ConstantExchange {
     public static final byte CURRENT_VERSION = (byte)100;
-    
+    public static final String ENCRYPTED_EXTENSION = "enc";
     
 }

@@ -24,6 +24,7 @@
 package ie.peternagy.jcrypto.algo;
 
 import ie.peternagy.jcrypto.util.CryptoSecurityUtil;
+import org.apache.commons.codec.binary.Hex;
 import org.bouncycastle.util.Arrays;
 import static org.junit.Assert.*;
 
@@ -36,11 +37,13 @@ public class AesWrapperTest extends AjUnitWrapper {
     protected static byte[] input;
     protected static byte[] output;
     protected static AesWrapper aesWrapper;
+    protected static EllipticCurveWrapper curve;
 
     public AesWrapperTest() {
         testClassName = AesWrapper.class.getName();
         input = CryptoSecurityUtil.getSecureBytes(128);
-        aesWrapper = new AesWrapper(null);
+        curve = new EllipticCurveWrapper();
+        aesWrapper = new AesWrapper(curve);
     }
 
     /**
@@ -99,6 +102,21 @@ public class AesWrapperTest extends AjUnitWrapper {
         assertArrayEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
+    }
+    
+    /**
+     * Test doFinalWithHeaders
+     */
+    @org.junit.Test
+    public void testDoFinalWithHeaders() {
+        System.out.println("doFinalWithHeaders");
+        aesWrapper.initCipher(true);
+        System.out.println("Data: " + Hex.encodeHexString(input));
+        byte[] data = aesWrapper.doFinalWithHeader(input);
+        aesWrapper.initCipher(false);
+        byte[] result = aesWrapper.doFinalWithHeader(data);
+        
+        assertTrue(Arrays.areEqual(result, input));
     }
 
 }
