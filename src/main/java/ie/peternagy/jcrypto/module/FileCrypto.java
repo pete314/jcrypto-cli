@@ -25,7 +25,7 @@ package ie.peternagy.jcrypto.module;
 
 import ie.peternagy.jcrypto.algo.AesWrapper;
 import ie.peternagy.jcrypto.algo.EllipticCurveWrapper;
-import ie.peternagy.jcrypto.util.FileAcccessUtil;
+import ie.peternagy.jcrypto.util.FileAccessUtil;
 import java.io.File;
 import org.apache.commons.io.FilenameUtils;
 
@@ -39,7 +39,7 @@ public class FileCrypto {
     public FileCrypto(String filePath) {
         curve = new EllipticCurveWrapper();
         aesWrapper = new AesWrapper(curve);
-        inputFile = FileAcccessUtil.getFileByName(filePath);
+        inputFile = FileAccessUtil.getFileByName(filePath);
         inputFileString = filePath;
         if("enc".equals(FilenameUtils.getExtension(filePath))){
             isEncrypt = false;
@@ -51,7 +51,7 @@ public class FileCrypto {
     }
     
     public void cryptFile(){
-        byte[] fileContent = FileAcccessUtil.readFromDisk(inputFile);
+        byte[] fileContent = FileAccessUtil.readFromDisk(inputFile);
         byte[] data;
         String outFileName;
         if(isEncrypt){
@@ -62,7 +62,7 @@ public class FileCrypto {
             outFileName = inputFileString.substring(0, inputFileString.length() - 4);
         }
         
-        FileAcccessUtil.writeToDisk(outFileName, data);
+        FileAccessUtil.writeToDisk(outFileName, data);
     }
     
 }

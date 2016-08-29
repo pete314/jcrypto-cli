@@ -111,7 +111,7 @@ public class AesWrapperTest extends AjUnitWrapper {
     public void testDoFinalWithHeaders() {
         System.out.println("doFinalWithHeaders");
         aesWrapper.initCipher(true);
-        System.out.println("Data: " + Hex.encodeHexString(input));
+        
         byte[] data = aesWrapper.doFinalWithHeader(input);
         aesWrapper.initCipher(false);
         byte[] result = aesWrapper.doFinalWithHeader(data);
@@ -119,4 +119,19 @@ public class AesWrapperTest extends AjUnitWrapper {
         assertTrue(Arrays.areEqual(result, input));
     }
 
+    /**
+     * Test doFinalWithHeaders - compact init
+     */
+    @org.junit.Test
+    public void testDoFinalWithHeadersCompact() {
+        System.out.println("doFinalWithHeaders - compact");
+        input = CryptoSecurityUtil.getSecureBytes(128);
+        aesWrapper = new AesWrapper(new EllipticCurveWrapper(), true);
+        
+        byte[] data = aesWrapper.doFinalWithHeader(input);
+        aesWrapper = new AesWrapper(new EllipticCurveWrapper(), false);
+        byte[] result = aesWrapper.doFinalWithHeader(data);
+        
+        assertTrue(Arrays.areEqual(result, input));
+    }
 }

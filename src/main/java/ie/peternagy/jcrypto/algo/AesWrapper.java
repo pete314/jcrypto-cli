@@ -44,6 +44,7 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.util.encoders.Hex;
 
 public class AesWrapper {
 
@@ -67,6 +68,14 @@ public class AesWrapper {
         baseKey = CryptoSecurityUtil.getSecureBytes(64);
         generateSecretKey();
     }
+
+    public AesWrapper(EllipticCurveWrapper curve, boolean state) {
+        this(curve);
+        this.state = state;
+        initCipher(state);
+    }
+    
+    
 
     /**
      * Initialize the cipher

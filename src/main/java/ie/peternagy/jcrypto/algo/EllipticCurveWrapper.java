@@ -25,8 +25,9 @@ package ie.peternagy.jcrypto.algo;
 
 import ie.peternagy.jcrypto.util.CryptoSecurityUtil;
 import ie.peternagy.jcrypto.util.CryptoSignatureUtil;
-import ie.peternagy.jcrypto.util.FileAcccessUtil;
+import ie.peternagy.jcrypto.util.FileAccessUtil;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
@@ -168,7 +169,8 @@ public class EllipticCurveWrapper {
         byte[] content = ArrayUtils.subarray(data, currentPosition, data.length);
         
         if(version != 100 || !Arrays.equals(keyId, getKeyId()) || CryptoSignatureUtil.calculateCrc32(content) != crcSum){
-            throw new RuntimeException("EC headers do not match - decrypt");
+            String reason = version != 100 ? "Invalid version " : !Arrays.equals(keyId, getKeyId()) ? " Invalid key id" : " Invalid data checksum";
+            throw new RuntimeException("EC headers do not match - decrypt " + reason);
         }
         
         return content;
@@ -178,6 +180,11 @@ public class EllipticCurveWrapper {
      * Generate a set of Elliptic Curve keys
      */
     public void generateKeys() {
+        tryLoadKeys();
+        if(isInitialized(true) && isInitialized(false)){
+            return;
+        }
+        
         try {
             ECGenParameterSpec ecGenSpec = new ECGenParameterSpec(EC_CURVE);
             KeyPairGenerator g = KeyPairGenerator.getInstance(ALGORITHM_NAME);
@@ -225,8 +232,8 @@ public class EllipticCurveWrapper {
      */
     public void tryLoadKeys() {
         try {
-            byte[] publicBytes = Hex.decodeHex(new String(FileAcccessUtil.readFromDisk(getKeyFilePath(false))).toCharArray());
-            byte[] privateBytes = Hex.decodeHex(new String(FileAcccessUtil.readFromDisk(getKeyFilePath(true))).toCharArray());
+            byte[] publicBytes = Hex.decodeHex(new String(FileAccessUtil.readFromDisk(getKeyFilePath(false))).toCharArray());
+            byte[] privateBytes = Hex.decodeHex(new String(FileAccessUtil.readFromDisk(getKeyFilePath(true))).toCharArray());
             KeyFactory fact = KeyFactory.getInstance("ECDSA", "BC");
             publicKey = fact.generatePublic(new X509EncodedKeySpec(publicBytes));
             privateKey = fact.generatePrivate(new PKCS8EncodedKeySpec(privateBytes));
@@ -242,8 +249,8 @@ public class EllipticCurveWrapper {
         char[] publicBytes = Hex.encodeHex(publicKey.getEncoded());
         char[] privateBytes = Hex.encodeHex(privateKey.getEncoded());
 
-        FileAcccessUtil.writeToDisk(getKeyFilePath(false), new String(publicBytes).getBytes());
-        FileAcccessUtil.writeToDisk(getKeyFilePath(true), new String(privateBytes).getBytes());
+        FileAccessUtil.writeToDisk(getKeyFilePath(false), new String(publicBytes).getBytes());
+        FileAccessUtil.writeToDisk(getKeyFilePath(true), new String(privateBytes).getBytes());
     }
 
     /**
@@ -253,6 +260,6 @@ public class EllipticCurveWrapper {
      * @return the string path
      */
     protected String getKeyFilePath(boolean isPrivate) {
-        return String.format("%s/%s", FileAcccessUtil.getUserHome(true), isPrivate ? PRIVATE_KEY_FILE_NAME : PUBLIC_KEY_FILE_NAME);
+        return String.format("%s%s%s", FileAccessUtil.getUserHome(true), File.separator, isPrivate ? PRIVATE_KEY_FILE_NAME : PUBLIC_KEY_FILE_NAME);
     }
 }

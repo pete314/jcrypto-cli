@@ -26,13 +26,14 @@ package ie.peternagy.jcrypto.util;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class FileAcccessUtil {
+public class FileAccessUtil {
     
     private static final String APP_FOLDER_NAME = ".jcrypto";
     
@@ -72,7 +73,7 @@ public class FileAcccessUtil {
             try {
                 file.createNewFile();
             } catch (IOException ex) {
-                Logger.getLogger(FileAcccessUtil.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(FileAccessUtil.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
         if(file.isFile() && file.canWrite())
@@ -94,20 +95,23 @@ public class FileAcccessUtil {
     }
     
     /**
-     * Write bytes to disk 
+     * Write bytes to disk - by replacing the current content
      * 
      * @param outFile - file to write to
      * @param content - data to write
      * @return the result true|false
      */
     public static boolean writeToDisk(File outFile, byte[] content){
-        try(final FileChannel writeFileChannel = new RandomAccessFile(outFile, "rw").getChannel()){
+        try(RandomAccessFile raf = new RandomAccessFile(outFile, "rw");
+            final FileChannel writeFileChannel = raf.getChannel()){
+            
+            raf.setLength(0);
             MappedByteBuffer buffer = writeFileChannel.map(FileChannel.MapMode.READ_WRITE, 0, content.length);
             buffer.put(content);
             
             return true;
         } catch (IOException ex) {
-            Logger.getLogger(FileAcccessUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FileAccessUtil.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return false;
@@ -125,7 +129,7 @@ public class FileAcccessUtil {
             
             return allBytes;
         } catch (IOException ex) {
-            Logger.getLogger(FileAcccessUtil.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FileAccessUtil.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException("Input file is not readable \n" + ex);
         }
     }

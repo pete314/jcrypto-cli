@@ -18,17 +18,16 @@
  * @author Peter Nagy - peternagy.ie
  * @since August 2016
  * @version 0.1
- * @description ConstantExchange
- * @package ie.peternagy.jcrypto.util
+ * @description IConfigHandler - Config handler interface for storage service
+ * @package ie.peternagy.jcrypto.module
  */
-package ie.peternagy.jcrypto.util;
+package ie.peternagy.jcrypto.module;
 
-import java.io.File;
+import java.util.Map;
 
-public class ConstantExchange {
-    public static final byte CURRENT_VERSION = (byte)100;
-    public static final String ENCRYPTED_EXTENSION = "enc";
-    public static final String STORAGE_CONFIG_FILE_NAME = "storage_conf.enc";
-    public static final File STORAGE_CONF_FILE = new File(FileAccessUtil.getUserHome(true) + File.separator + ConstantExchange.STORAGE_CONFIG_FILE_NAME);
+public interface IConfigHandler {
     
+    public void parseConfigInput();
+    public void validateConfig(Map service);
+    public Object getInitializedServiceClient();
 }

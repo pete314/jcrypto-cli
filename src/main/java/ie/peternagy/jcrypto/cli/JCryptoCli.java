@@ -26,6 +26,7 @@ package ie.peternagy.jcrypto.cli;
 import ie.peternagy.jcrypto.algo.AesWrapper;
 import ie.peternagy.jcrypto.algo.EllipticCurveWrapper;
 import ie.peternagy.jcrypto.module.FileCrypto;
+import ie.peternagy.jcrypto.module.JCryptoConfig;
 import ie.peternagy.jcrypto.util.CryptoSecurityUtil;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
@@ -44,6 +45,7 @@ public class JCryptoCli {
             Options options = new Options();
             options.addOption("v", "verbose", false, "Show details of the process");
             options.addOption("b", "banchmark", false, "Run a banchmark test on implementation");
+            options.addOption("c", "configure", false, "Run the configuration to setup backup options");
             options.addOption("f", "file", true, "The file to work with");
 
             CommandLineParser parser = new DefaultParser();
@@ -58,6 +60,8 @@ public class JCryptoCli {
             }else if(line.hasOption('f')){
                 FileCrypto fileCrypto = new FileCrypto(line.getOptionValue('f'));
                 fileCrypto.cryptFile();
+            }else if(line.hasOption('c')){
+                JCryptoConfig.showConfigOptions();
             }
             
             if(isVerbose){
