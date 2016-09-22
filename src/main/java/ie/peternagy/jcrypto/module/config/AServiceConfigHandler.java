@@ -22,7 +22,7 @@
  * service
  * @package ie.peternagy.jcrypto.module
  */
-package ie.peternagy.jcrypto.module;
+package ie.peternagy.jcrypto.module.config;
 
 import ie.peternagy.jcrypto.algo.AesWrapper;
 import ie.peternagy.jcrypto.algo.EllipticCurveWrapper;
@@ -47,6 +47,38 @@ public abstract class AServiceConfigHandler {
     public AServiceConfigHandler() {
         readStorageConfig();
     }
+    
+    /**
+     * Get service params by service name
+     * @param serviceName
+     * @return Map with parameters
+     */
+    public Map getService(String serviceName) {
+        return services.get(serviceName);
+    }
+    
+    /**
+     * Get service params from user input
+     * 
+     * @param serviceName
+     * @param serviceParams 
+     */
+    protected void getServiceParams(String serviceName, String[] serviceParams){
+        String inputString;
+        service = new HashMap();
+        service.put("service", serviceName);
+        
+        for (String param : serviceParams) {
+            String currentValue = "none";
+            if (services.containsKey(serviceName)) {
+                currentValue = (String) services.get(serviceName).get(param);
+            }
+            System.out.printf("%s (Current: %s): ", param.replace('-', ' '), currentValue);
+            
+            inputString = CLI_IN.next();
+            service.put(param, inputString == null ? currentValue : inputString);
+        }
+    }
 
     /**
      * Read encrypted storage configuration yaml
@@ -66,12 +98,10 @@ public abstract class AServiceConfigHandler {
             Yaml yaml = new Yaml();
             for (Object entryBlock : yaml.loadAll(new String(configYamlBytes, "UTF-8"))) {
                 service = (Map) entryBlock;
-                String serviceName = (String) service.get("service");
-                services.put(serviceName, service);
+                String serviceConfigName = (String) service.get("service");
+                services.put(serviceConfigName, service);
             }
-        } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(JCryptoConfig.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+        }  catch (IOException ex) {
             Logger.getLogger(JCryptoConfig.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

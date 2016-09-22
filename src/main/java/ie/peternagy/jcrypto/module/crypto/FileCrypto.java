@@ -21,7 +21,7 @@
  * @description FileCrypto - File en/decryption module
  * @package ie.peternagy.jcrypto.module
  */
-package ie.peternagy.jcrypto.module;
+package ie.peternagy.jcrypto.module.crypto;
 
 import ie.peternagy.jcrypto.algo.AesWrapper;
 import ie.peternagy.jcrypto.algo.EllipticCurveWrapper;

@@ -21,13 +21,20 @@
  * @description JCryptoConfig - The class handles configuration
  * @package ie.peternagy.jcrypto.module
  */
-package ie.peternagy.jcrypto.module;
+package ie.peternagy.jcrypto.module.config;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class JCryptoConfig {
     private static final Scanner CLI_IN = new Scanner(System.in);
-
+    public static final Map<String, IConfigHandler> AVAILABLE_STORAGE_PROVIDERS = new HashMap<String, IConfigHandler>(){
+        {
+            put("s3", new S3ConfigHandler());
+        }
+    };//, "dropbox", "onedrive"};
+    
     /**
      * @todo: All config changes should include account lookup
      * @todo: Should create default empty config file and load
@@ -44,7 +51,6 @@ public class JCryptoConfig {
                     printMessage("bye now");
                     return;
                 case 1:
-                    printMessage("Option 1");
                     S3ConfigHandler configHandler = new S3ConfigHandler();
                     configHandler.parseConfigInput();
                     break;
@@ -53,6 +59,9 @@ public class JCryptoConfig {
                     break;
                 case 3:
                     printMessage("Option 3");
+                    break;
+                case 4:
+                    printMessage("Option 4");
                     break;
                 default:
                     printMessage("Invalid option");

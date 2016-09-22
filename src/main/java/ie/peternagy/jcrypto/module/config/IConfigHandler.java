@@ -21,7 +21,7 @@
  * @description IConfigHandler - Config handler interface for storage service
  * @package ie.peternagy.jcrypto.module
  */
-package ie.peternagy.jcrypto.module;
+package ie.peternagy.jcrypto.module.config;
 
 import java.util.Map;
 

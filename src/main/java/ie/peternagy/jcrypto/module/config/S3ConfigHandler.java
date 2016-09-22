@@ -21,7 +21,7 @@
  * @description S3ConfigHandler - Configuration handler for AWS simple storage
  * @package ie.peternagy.jcrypto.module
  */
-package ie.peternagy.jcrypto.module;
+package ie.peternagy.jcrypto.module.config;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -29,50 +29,36 @@ import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import static ie.peternagy.jcrypto.module.JCryptoConfig.printMessage;
-import ie.peternagy.jcrypto.util.ConstantExchange;
-import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 public class S3ConfigHandler extends AServiceConfigHandler implements IConfigHandler {
 
-    private final String SERVICE_NAME = "aws-s3";
+    protected final String SERVICE_NAME = "aws-s3";
     private final String[] SERVICE_REQUIRED_PARAMS = {"access-key", "secret-key", "bucket-name"};
 
     public S3ConfigHandler() {
         super();
-        service = tryLoadServiceConfig();
-    }
-
-    protected final Map tryLoadServiceConfig() {
-        if (services != null && services.containsKey(SERVICE_NAME)) {
-            return services.get(SERVICE_NAME);
-        }
-
-        return null;
+        service = getService(SERVICE_NAME);
     }
 
     @Override
     public void parseConfigInput() {
-        String inputString;
-        service = new HashMap();
-        service.put("service", SERVICE_NAME);
-        printMessage("Aws simple storage configuration");
-        for (String param : SERVICE_REQUIRED_PARAMS) {
-            String currentValue = "none";
-            if (services.containsKey(SERVICE_NAME)) {
-                currentValue = (String) services.get(SERVICE_NAME).get(param);
-            }
-            System.out.printf("%s (Current: %s): ", param.replace('-', ' '), currentValue);
-            inputString = CLI_IN.next();
-            service.put(param, inputString == null ? currentValue : inputString);
-        }
+        System.out.println("\n\nAmazon simple storage configuration\n\n");
+        getServiceParams(SERVICE_NAME, SERVICE_REQUIRED_PARAMS);
         validateConfig(service);
-        services.put(SERVICE_NAME, service);
 
-        writeStorageConfig();
+        String input;
+        do {
+            System.out.print("\nWould you like to save it? (y/n)");
+            input = CLI_IN.next();
+            if (input.equalsIgnoreCase("y")) {
+                services.put(SERVICE_NAME, service);
+                writeStorageConfig();
+                break;
+            }else if(input.equalsIgnoreCase("n")){
+                break;
+            }
+        } while (true);
     }
 
     @Override
@@ -113,8 +99,8 @@ public class S3ConfigHandler extends AServiceConfigHandler implements IConfigHan
 
         return null;
     }
-    
-    public String getBucketName(){
-        return (String)service.get("bucket-name");
+
+    public String getBucketName() {
+        return (String) service.get("bucket-name");
     }
 }
