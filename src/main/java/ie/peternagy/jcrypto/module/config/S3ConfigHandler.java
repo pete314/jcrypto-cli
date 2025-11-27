@@ -31,16 +31,28 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import java.util.Map;
 
+/**
+ * S3ConfigHandler handles configuration for Amazon S3 storage service.
+ * It implements the IConfigHandler interface and extends AServiceConfigHandler.
+ */
 public class S3ConfigHandler extends AServiceConfigHandler implements IConfigHandler {
 
     protected final String SERVICE_NAME = "aws-s3";
     private final String[] SERVICE_REQUIRED_PARAMS = {"access-key", "secret-key", "bucket-name"};
 
+    /**
+     * Constructor for S3ConfigHandler.
+     * Initializes the handler and loads existing S3 configuration if available.
+     */
     public S3ConfigHandler() {
         super();
         service = getService(SERVICE_NAME);
     }
 
+    /**
+     * Parses configuration input from the user via CLI.
+     * Prompts for access key, secret key, and bucket name, validates them, and optionally saves the configuration.
+     */
     @Override
     public void parseConfigInput() {
         System.out.println("\n\nAmazon simple storage configuration\n\n");
@@ -61,6 +73,12 @@ public class S3ConfigHandler extends AServiceConfigHandler implements IConfigHan
         } while (true);
     }
 
+    /**
+     * Validates the S3 configuration.
+     * Checks if the credentials are valid and if the specified bucket exists.
+     *
+     * @param config Map containing configuration parameters (access-key, secret-key, bucket-name).
+     */
     @Override
     public void validateConfig(Map config) {
         AWSCredentials credentials = new BasicAWSCredentials((String) config.get("access-key"), (String) config.get("secret-key"));
@@ -90,6 +108,11 @@ public class S3ConfigHandler extends AServiceConfigHandler implements IConfigHan
         }
     }
 
+    /**
+     * Gets an initialized AmazonS3Client based on the current configuration.
+     *
+     * @return An initialized AmazonS3Client object, or null if the service configuration is missing.
+     */
     @Override
     public Object getInitializedServiceClient() {
         if (service != null) {
@@ -100,6 +123,11 @@ public class S3ConfigHandler extends AServiceConfigHandler implements IConfigHan
         return null;
     }
 
+    /**
+     * Gets the configured bucket name.
+     *
+     * @return The bucket name as a String.
+     */
     public String getBucketName() {
         return (String) service.get("bucket-name");
     }

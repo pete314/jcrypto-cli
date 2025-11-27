@@ -29,6 +29,10 @@ import ie.peternagy.jcrypto.util.FileAccessUtil;
 import java.io.File;
 import org.apache.commons.io.FilenameUtils;
 
+/**
+ * FileCrypto class handles encryption and decryption of files.
+ * It uses AesWrapper and EllipticCurveWrapper to perform the cryptographic operations.
+ */
 public class FileCrypto {
     private final AesWrapper aesWrapper;
     private final EllipticCurveWrapper curve;
@@ -36,6 +40,12 @@ public class FileCrypto {
     private final String inputFileString;
     private boolean isEncrypt;
     
+    /**
+     * Constructor for FileCrypto.
+     * Initializes the cryptographic wrappers and determines the mode (encrypt/decrypt) based on file extension.
+     *
+     * @param filePath The path to the file to be processed.
+     */
     public FileCrypto(String filePath) {
         curve = new EllipticCurveWrapper();
         aesWrapper = new AesWrapper(curve);
@@ -50,6 +60,12 @@ public class FileCrypto {
         }
     }
     
+    /**
+     * Performs file encryption or decryption.
+     * Reads the input file, processes it, and writes the result to a new file.
+     * If encrypting, appends ".enc" to the filename.
+     * If decrypting, removes the last 4 characters (assumed to be ".enc") from the filename.
+     */
     public void cryptFile(){
         byte[] fileContent = FileAccessUtil.readFromDisk(inputFile);
         byte[] data;

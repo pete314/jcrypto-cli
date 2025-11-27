@@ -33,6 +33,10 @@ import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 
+/**
+ * CryptoSecurityUtil provides utility methods for cryptographic security.
+ * This includes generating secure random numbers, bytes, IVs, and passwords.
+ */
 public class CryptoSecurityUtil {
 
     private static final String RANDOM_SOURCE = "SHA1PRNG";
@@ -43,9 +47,10 @@ public class CryptoSecurityUtil {
     };
 
     /**
-     * Get an initialized SecureRandom instance
+     * Get an initialized SecureRandom instance using SHA1PRNG.
      *
-     * @return SecureRandom
+     * @return SecureRandom instance.
+     * @throws RuntimeException if the algorithm is not available.
      */
     public static SecureRandom getSecureRandom() {
         try {
@@ -56,10 +61,10 @@ public class CryptoSecurityUtil {
     }
 
     /**
-     * Get secure random bytes
+     * Get secure random bytes.
      *
-     * @param length - number of bytes to generate
-     * @return byte[] with secure bytes
+     * @param length - number of bytes to generate.
+     * @return byte[] with secure random bytes.
      */
     public static byte[] getSecureBytes(int length) {
         SecureRandom secRandom = getSecureRandom();
@@ -71,11 +76,11 @@ public class CryptoSecurityUtil {
     }
 
     /**
-     * Generate a random int in range
+     * Generate a random int in range.
      *
-     * @param min - the lower bound
-     * @param max - the upper bound
-     * @return the generated random integer
+     * @param min - the lower bound (inclusive).
+     * @param max - the upper bound (exclusive).
+     * @return the generated random integer.
      */
     public static int getRandomIntInRange(int min, int max) {
         SecureRandom secRandom = getSecureRandom();
@@ -84,18 +89,20 @@ public class CryptoSecurityUtil {
     }
 
     /**
-     * Generate a secure random big integer
-     * @return 
+     * Generate a secure random big integer (128 bits).
+     *
+     * @return BigInteger representing the random value.
      */
     public static BigInteger getRandomBigInt(){
         return new BigInteger(128, getSecureRandom());
     }
 
     /**
-     * Generate secure IV based on algorithm spec
+     * Generate secure IV based on algorithm spec.
      *
-     * @param cipherAlgorithmName - the name of the algorithm to use eg: "AES"
-     * @return
+     * @param cipherAlgorithmName - the name of the algorithm to use eg: "AES".
+     * @return IvParameterSpec containing the generated IV.
+     * @throws RuntimeException if the algorithm is invalid or padding is incorrect.
      */
     public static IvParameterSpec generateSecureIV(String cipherAlgorithmName) {
         try {
@@ -108,10 +115,12 @@ public class CryptoSecurityUtil {
     }
 
     /**
-     * Generate secure password based on the asci table
+     * Generate secure password based on the asci table.
+     * Uses a restricted set of ASCII characters (33-126) with specific exclusions.
      *
-     * @param length - minimum 15 maximum 256 char length
-     * @return
+     * @param length - minimum 15 maximum 256 char length.
+     * @return char[] containing the generated password.
+     * @throws RuntimeException if length is not between 15 and 256.
      */
     public static char[] generateSecurePassword(final int length) {
         if (length < 15 || length > 256) {
@@ -132,11 +141,11 @@ public class CryptoSecurityUtil {
     }
 
     /**
-     * Generate a random integer, in range with exclusions
+     * Generate a random integer, in range with exclusions.
+     * Range from 33 to 127.
      *
-     * Range from 33 to 127
-     *
-     * @return random integer
+     * @param lowerBound The lower bound for the random ASCII value.
+     * @return random integer representing an ASCII value.
      */
     private static int getAsciiValueWithExclusions(int lowerBound) {
 

@@ -30,13 +30,17 @@ import java.util.logging.Logger;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
+/**
+ * CryptoSignatureUtil provides utility methods for data signing and integrity verification.
+ * It includes methods for calculating CRC32 checksums and SHA-256 hashes.
+ */
 public class CryptoSignatureUtil {
     
     /**
-     * Calculate CRC32
+     * Calculate CRC32 checksum for the given content.
      * 
-     * @param content - the data to sign
-     * @return the checksum
+     * @param content - the data to sign as a byte array.
+     * @return the checksum as a long value.
      */
     public static long calculateCrc32(final byte[] content) {
         Checksum checksum = new CRC32();
@@ -45,9 +49,10 @@ public class CryptoSignatureUtil {
     }
     
     /**
-     * Calculate SHA256 
-     * @param content - the data to sign
-     * @return the checksum
+     * Calculate SHA256 hash for the given content.
+     *
+     * @param content - the data to sign as a byte array.
+     * @return the SHA-256 hash as a byte array, or null if the SHA-256 algorithm is not available.
      */
     public static byte[] calculateSHA256(final byte[] content){
         try {

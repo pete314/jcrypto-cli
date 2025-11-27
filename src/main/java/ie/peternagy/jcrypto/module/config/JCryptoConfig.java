@@ -27,6 +27,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+/**
+ * JCryptoConfig class handles the top-level configuration menu for the application.
+ * It allows users to select and configure different storage providers.
+ */
 public class JCryptoConfig {
     private static final Scanner CLI_IN = new Scanner(System.in);
     public static final Map<String, IConfigHandler> AVAILABLE_STORAGE_PROVIDERS = new HashMap<String, IConfigHandler>(){
@@ -36,6 +40,9 @@ public class JCryptoConfig {
     };//, "dropbox", "onedrive"};
     
     /**
+     * Show configuration options to the user and handle their selection.
+     * Displays a menu for configuring supported storage providers.
+     *
      * @todo: All config changes should include account lookup
      * @todo: Should create default empty config file and load
      */
@@ -70,12 +77,12 @@ public class JCryptoConfig {
     }
     
     /**
-     * Try parse string input to integer in range
+     * Try parse string input to integer in range.
      *
-     * @param input - the input string
-     * @param min - the lower bound of accepted number
-     * @param max - the upper bound of accepted number
-     * @return the valid number or -1 if invalid
+     * @param input - the input string to parse.
+     * @param min - the lower bound of accepted number.
+     * @param max - the upper bound of accepted number.
+     * @return the valid number or -1 if invalid or out of range.
      */
     protected static int tryParseInt(String input, int min, int max) {
         try {
@@ -91,9 +98,9 @@ public class JCryptoConfig {
     }
 
     /**
-     * Print message(s)
+     * Print message(s) to the standard output.
      *
-     * @param messages - the message(s) to print
+     * @param messages - variable number of message strings to print.
      */
     public static void printMessage(String... messages) {
         for (String msg : messages) {

@@ -23,6 +23,10 @@
  */
 package ie.peternagy.jcrypto.module.storage;
 
+/**
+ * S3Wrapper provides a wrapper around Amazon S3 operations.
+ * Currently, this class serves as a placeholder or base for S3 interactions.
+ */
 public class S3Wrapper {
     
 }

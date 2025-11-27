@@ -46,6 +46,10 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Hex;
 
+/**
+ * AesWrapper class provides a wrapper around AES encryption and decryption operations.
+ * It handles key generation, cipher initialization, and data processing.
+ */
 public class AesWrapper {
 
     private final String KEYGEN_ALGORITHM = "PBKDF2WithHmacSHA512";
@@ -59,6 +63,12 @@ public class AesWrapper {
     private final String ALGORITHM_NAME = "AES";
     private boolean state;//true>>encrypt
 
+    /**
+     * Constructor for AesWrapper.
+     * Initializes the Bouncy Castle provider and generates initial keys and IVs.
+     *
+     * @param curve The EllipticCurveWrapper instance used for key encryption.
+     */
     public AesWrapper(EllipticCurveWrapper curve) {
         Security.addProvider(new BouncyCastleProvider());
         Security.getProvider("BC");
@@ -69,6 +79,12 @@ public class AesWrapper {
         generateSecretKey();
     }
 
+    /**
+     * Constructor for AesWrapper with initial state.
+     *
+     * @param curve The EllipticCurveWrapper instance used for key encryption.
+     * @param state The initial state of the cipher (true for encryption, false for decryption).
+     */
     public AesWrapper(EllipticCurveWrapper curve, boolean state) {
         this(curve);
         this.state = state;
@@ -78,9 +94,10 @@ public class AesWrapper {
     
 
     /**
-     * Initialize the cipher
+     * Initialize the cipher for encryption or decryption.
      *
-     * @param isEncrypt - true >> encryption
+     * @param isEncrypt boolean flag indicating the mode: true for encryption, false for decryption.
+     * @throws RuntimeException if initialization fails due to security exceptions.
      */
     public void initCipher(boolean isEncrypt) {
         try {
@@ -94,8 +111,9 @@ public class AesWrapper {
     }
 
     /**
-     * Generate secret key from iv, salt, baseKey
+     * Generate secret key from iv, salt, baseKey using PBKDF2WithHmacSHA512.
      *
+     * @throws RuntimeException if the key generation fails.
      */
     protected final void generateSecretKey() {
         try {
@@ -111,9 +129,9 @@ public class AesWrapper {
     }
 
     /**
-     * Close final block of multi part encryption
+     * Close final block of multi part encryption.
      *
-     * @return the final block
+     * @return the final block of encrypted or decrypted data, or null if an exception occurs.
      */
     public byte[] doFinal() {
         try {
@@ -125,10 +143,10 @@ public class AesWrapper {
     }
 
     /**
-     * Crypt the data
+     * Crypt the data using the initialized cipher.
      *
-     * @param data - the bytes to work with
-     * @return the modified bytes
+     * @param data The byte array of data to encrypt or decrypt.
+     * @return The modified bytes after encryption or decryption, or null if an exception occurs.
      */
     public byte[] doFinal(byte[] data) {
         try {
@@ -140,15 +158,23 @@ public class AesWrapper {
     }
 
     /**
-     * Encrypt a chunk of data (used in large data sets with doFinal())
+     * Encrypt a chunk of data (used in large data sets with doFinal()).
      *
-     * @param data - chunk to encrypt
-     * @return
+     * @param data The chunk of data to encrypt.
+     * @return The encrypted chunk.
      */
     public byte[] update(byte[] data) {
         return cipher.update(data);
     }
 
+    /**
+     * Performs the final encryption or decryption operation, handling the header.
+     * If encrypting, creates a header and prepends it to the encrypted data.
+     * If decrypting, extracts the header from the data before decrypting.
+     *
+     * @param data The data to process.
+     * @return The processed data, potentially with a header added or removed.
+     */
     public byte[] doFinalWithHeader(byte[] data) {
         if (state) {
             byte[] finalBlock = doFinal(data);
@@ -159,6 +185,12 @@ public class AesWrapper {
         }
     }
 
+    /**
+     * Creates a header containing metadata for the encrypted data.
+     * The header includes version, IV, salt, garbage bytes, and the base key encrypted with EC.
+     *
+     * @return The generated header as a byte array, or null if an IOException occurs.
+     */
     protected byte[] createHeader() {
         try {
             byte[] garbageByte = CryptoSecurityUtil.getSecureBytes(CryptoSecurityUtil.getRandomIntInRange(0, 768));
@@ -183,6 +215,12 @@ public class AesWrapper {
         return null;
     }
     
+    /**
+     * Extracts the header from the encrypted data and re-initializes the cipher.
+     *
+     * @param data The encrypted data including the header.
+     * @return The content part of the data, without the header.
+     */
     protected byte[] extractHeader(byte[] data){
         int version = data[0];
         int currentPosition = 1;

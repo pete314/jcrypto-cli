@@ -25,6 +25,10 @@ package ie.peternagy.jcrypto.util;
 
 import java.io.File;
 
+/**
+ * ConstantExchange holds application-wide constants.
+ * This includes version information, file extensions, and configuration file paths.
+ */
 public class ConstantExchange {
     public static final byte CURRENT_VERSION = (byte)100;
     public static final String ENCRYPTED_EXTENSION = "enc";

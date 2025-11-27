@@ -33,13 +33,19 @@ import java.nio.channels.FileChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * FileAccessUtil handles file input/output operations on the disk.
+ * It provides methods for reading/writing files, managing the application data folder, and checking file existence.
+ */
 public class FileAccessUtil {
     
     private static final String APP_FOLDER_NAME = ".jcrypto";
     
     /**
-     * Check and create the application data folder if required
-     * @return true if directory exist or created
+     * Check and create the application data folder if required.
+     * The folder is created in the user's home directory.
+     *
+     * @return true if directory exists or was successfully created, false otherwise.
      */
     protected static boolean checkCreateAppFolder(){
         File dir = new File(getUserHome(false) + "/" + APP_FOLDER_NAME);
@@ -50,9 +56,10 @@ public class FileAccessUtil {
     }
     
     /**
-     * Get the user home directory path
-     * @param includeAppFolder - appends the .jcrypto
-     * @return the path string | null
+     * Get the user home directory path.
+     *
+     * @param includeAppFolder - if true, appends the .jcrypto folder to the path.
+     * @return the path string to the user home directory (and optionally the app folder).
      */
     public static String getUserHome(boolean includeAppFolder){
         if(includeAppFolder){
@@ -63,9 +70,11 @@ public class FileAccessUtil {
     }
     
     /**
-     * Initialize and validate string file path
-     * @param filePath - the string path
-     * @return File with path
+     * Initialize and validate string file path.
+     * If the file does not exist, it attempts to create it.
+     *
+     * @param filePath - the string path to the file.
+     * @return File object if valid and writable, null otherwise.
      */
     public static File getFileByName(String filePath){
         File file = new File(filePath);
@@ -84,22 +93,23 @@ public class FileAccessUtil {
     
     
     /**
-     * Write bytes to disk 
+     * Write bytes to disk at the specified path.
      * 
-     * @param outFilePath - the file path string
-     * @param content - data to write
-     * @return the result true|false
+     * @param outFilePath - the file path string.
+     * @param content - data to write.
+     * @return true if write was successful, false otherwise.
      */
     public static boolean writeToDisk(String outFilePath, byte[] content){
         return writeToDisk(getFileByName(outFilePath), content);
     }
     
     /**
-     * Write bytes to disk - by replacing the current content
+     * Write bytes to disk - by replacing the current content.
+     * Uses memory-mapped files for efficient writing.
      * 
-     * @param outFile - file to write to
-     * @param content - data to write
-     * @return the result true|false
+     * @param outFile - file object to write to.
+     * @param content - data to write.
+     * @return true if write was successful, false otherwise.
      */
     public static boolean writeToDisk(File outFile, byte[] content){
         try(RandomAccessFile raf = new RandomAccessFile(outFile, "rw");
@@ -117,10 +127,24 @@ public class FileAccessUtil {
         return false;
     }
     
+    /**
+     * Read bytes from disk from the specified path.
+     *
+     * @param inFilePath - the file path string.
+     * @return byte[] containing the file content.
+     */
     public static byte[] readFromDisk(String inFilePath){
         return readFromDisk(getFileByName(inFilePath));
     }
     
+    /**
+     * Read bytes from disk from the specified file object.
+     * Uses memory-mapped files for efficient reading.
+     *
+     * @param inFile - the file object to read from.
+     * @return byte[] containing the file content.
+     * @throws RuntimeException if the input file is not readable.
+     */
     public static byte[] readFromDisk(File inFile){
         try (final FileChannel readFileChannel = new RandomAccessFile(inFile, "r").getChannel()){
             MappedByteBuffer buffer = readFileChannel.map(FileChannel.MapMode.READ_ONLY, 0, readFileChannel.size());

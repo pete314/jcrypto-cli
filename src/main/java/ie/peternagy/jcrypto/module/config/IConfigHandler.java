@@ -25,9 +25,29 @@ package ie.peternagy.jcrypto.module.config;
 
 import java.util.Map;
 
+/**
+ * IConfigHandler interface defines the contract for storage service configuration handlers.
+ * Implementations should handle parsing user input, validating configuration, and initializing service clients.
+ */
 public interface IConfigHandler {
     
+    /**
+     * Parse configuration input from the user (e.g., via CLI).
+     */
     public void parseConfigInput();
+
+    /**
+     * Validate the provided configuration map.
+     * This typically involves checking if credentials are correct and if the service is accessible.
+     *
+     * @param service The configuration map containing service parameters.
+     */
     public void validateConfig(Map service);
+
+    /**
+     * Get an initialized client for the service.
+     *
+     * @return An object representing the initialized service client (e.g., AmazonS3Client).
+     */
     public Object getInitializedServiceClient();
 }
