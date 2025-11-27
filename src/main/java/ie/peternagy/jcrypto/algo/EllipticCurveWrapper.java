@@ -56,6 +56,10 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+/**
+ * EllipticCurveWrapper class provides a wrapper around Elliptic Curve encryption and decryption operations.
+ * It handles key pair generation, key loading/saving, and ECIES cipher operations.
+ */
 public class EllipticCurveWrapper {
 
     private final String PUBLIC_KEY_FILE_NAME = "id_ecdsa.pub";
@@ -66,10 +70,14 @@ public class EllipticCurveWrapper {
     private PublicKey publicKey;
     private Cipher ecCipher;
 
+    /**
+     * Constructor for EllipticCurveWrapper.
+     * Initializes the Bouncy Castle provider, loads keys if available, and creates the ECIES cipher.
+     */
     public EllipticCurveWrapper() {
         Security.addProvider(new BouncyCastleProvider());
         try {
-            tryLoadKeys();
+            generateKeys();
             ecCipher = Cipher.getInstance(ALGORITHM_NAME, "BC");
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | NoSuchProviderException ex) {
             Logger.getLogger(EllipticCurveWrapper.class.getName()).log(Level.SEVERE, null, ex);
@@ -77,9 +85,9 @@ public class EllipticCurveWrapper {
     }
 
     /**
-     * Initialize the cipher for task
+     * Initialize the cipher for the specified task (encryption or decryption).
      *
-     * @param isEncrypt
+     * @param isEncrypt boolean flag indicating the mode: true for encryption, false for decryption.
      */
     private void initCipher(boolean isEncrypt) {
         try {
@@ -94,11 +102,11 @@ public class EllipticCurveWrapper {
     }
 
     /**
-     * Crypt the data
+     * Crypt the data using ECIES.
      *
-     * @param data - the bytes to work with
-     * @param isEncrypt
-     * @return the modified bytes
+     * @param data The byte array of data to encrypt or decrypt.
+     * @param isEncrypt boolean flag indicating the mode: true for encryption, false for decryption.
+     * @return The modified bytes after encryption or decryption, or null if an exception occurs.
      */
     public byte[] doFinal(byte[] data, boolean isEncrypt) {
         try {
@@ -111,10 +119,13 @@ public class EllipticCurveWrapper {
     }
 
     /**
-     * Crypt data with signature(header)
-     * @param data - the bytes to work with
-     * @param isEncrypt
-     * @return the modified bytes with header
+     * Crypt data with signature (header) included.
+     * If encrypting, adds a header with CRC32.
+     * If decrypting, extracts and verifies the header.
+     *
+     * @param data The bytes to work with.
+     * @param isEncrypt boolean flag indicating the mode: true for encryption, false for decryption.
+     * @return The modified bytes with header (if encrypting) or without header (if decrypting).
      */
     public byte[] doFinalWithHeader(byte[] data, boolean isEncrypt) {
         if (isEncrypt) {
@@ -129,10 +140,10 @@ public class EllipticCurveWrapper {
     }
 
     /**
-     * Create raw header - includes version, keyId, crc
+     * Create raw header - includes version, keyId, crc.
      * 
-     * @param dataCrc
-     * @return 
+     * @param dataCrc The CRC32 checksum of the data.
+     * @return The constructed header as a byte array, or null if an IOException occurs.
      */
     public byte[] createRawHeader(long dataCrc) {
         try {
@@ -153,9 +164,11 @@ public class EllipticCurveWrapper {
     }
     
     /**
-     * Extract header parameters from data
-     * @param data - content with header signature
-     * @return 
+     * Extract header parameters from data and verify version, key ID, and checksum.
+     *
+     * @param data The content with header signature.
+     * @return The content bytes without the header.
+     * @throws RuntimeException if version, key ID, or checksum verification fails.
      */
     public byte[] extractRawHeader(byte[] data){
         int version = data[0];
@@ -177,7 +190,8 @@ public class EllipticCurveWrapper {
     }
 
     /**
-     * Generate a set of Elliptic Curve keys
+     * Generate a set of Elliptic Curve keys (secp521r1).
+     * Keys are saved to disk after generation.
      */
     public void generateKeys() {
         tryLoadKeys();
@@ -200,9 +214,9 @@ public class EllipticCurveWrapper {
     }
 
     /**
-     * Get the sha256 bytes of private key
+     * Get the sha256 bytes of private key.
      *
-     * @return
+     * @return The SHA-256 hash of the private key encoded bytes, or null if private key is not initialized.
      */
     public byte[] getKeyId() {
         if (privateKey != null) {
@@ -213,10 +227,10 @@ public class EllipticCurveWrapper {
     }
 
     /**
-     * Check the keys are available
+     * Check if the keys are available (initialized).
      *
-     * @param checkPrivate
-     * @return
+     * @param checkPrivate boolean flag: true to check private key, false to check public key.
+     * @return true if the specified key is initialized, false otherwise.
      */
     public boolean isInitialized(boolean checkPrivate) {
         if ((checkPrivate && privateKey != null)
@@ -228,12 +242,20 @@ public class EllipticCurveWrapper {
     }
 
     /**
-     * Try load the keys from disk
+     * Try load the keys from disk.
+     * Attempts to read the public and private keys from their default file locations.
      */
     public void tryLoadKeys() {
         try {
-            byte[] publicBytes = Hex.decodeHex(new String(FileAccessUtil.readFromDisk(getKeyFilePath(false))).toCharArray());
-            byte[] privateBytes = Hex.decodeHex(new String(FileAccessUtil.readFromDisk(getKeyFilePath(true))).toCharArray());
+            byte[] publicFileContent = FileAccessUtil.readFromDisk(getKeyFilePath(false));
+            byte[] privateFileContent = FileAccessUtil.readFromDisk(getKeyFilePath(true));
+
+            if (publicFileContent.length == 0 || privateFileContent.length == 0) {
+                return;
+            }
+
+            byte[] publicBytes = Hex.decodeHex(new String(publicFileContent).toCharArray());
+            byte[] privateBytes = Hex.decodeHex(new String(privateFileContent).toCharArray());
             KeyFactory fact = KeyFactory.getInstance("ECDSA", "BC");
             publicKey = fact.generatePublic(new X509EncodedKeySpec(publicBytes));
             privateKey = fact.generatePrivate(new PKCS8EncodedKeySpec(privateBytes));
@@ -243,7 +265,7 @@ public class EllipticCurveWrapper {
     }
 
     /**
-     * Write the keys to disk
+     * Write the keys to disk encoded in Hex.
      */
     protected void writeKeys() {
         char[] publicBytes = Hex.encodeHex(publicKey.getEncoded());
@@ -254,10 +276,10 @@ public class EllipticCurveWrapper {
     }
 
     /**
-     * Generate the string path to key files
+     * Generate the string path to key files.
      *
-     * @param isPrivate
-     * @return the string path
+     * @param isPrivate boolean flag: true for private key file path, false for public key file path.
+     * @return the string path to the key file.
      */
     protected String getKeyFilePath(boolean isPrivate) {
         return String.format("%s%s%s", FileAccessUtil.getUserHome(true), File.separator, isPrivate ? PRIVATE_KEY_FILE_NAME : PUBLIC_KEY_FILE_NAME);

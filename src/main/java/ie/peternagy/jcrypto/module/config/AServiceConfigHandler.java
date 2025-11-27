@@ -38,30 +38,42 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.yaml.snakeyaml.Yaml;
 
+/**
+ * AServiceConfigHandler is an abstract base class for handling storage service configuration.
+ * It provides methods for reading/writing configuration (potentially encrypted),
+ * querying service parameters, and handling user input for configuration updates.
+ */
 public abstract class AServiceConfigHandler {
 
     protected Map<String, Map> services;
     protected Map service;
     protected final Scanner CLI_IN = new Scanner(System.in);
 
+    /**
+     * Constructor for AServiceConfigHandler.
+     * Initializes the handler by reading the existing storage configuration.
+     */
     public AServiceConfigHandler() {
         readStorageConfig();
     }
     
     /**
-     * Get service params by service name
-     * @param serviceName
-     * @return Map with parameters
+     * Get service params by service name.
+     *
+     * @param serviceName The name of the service to retrieve configuration for.
+     * @return Map containing the service parameters.
      */
     public Map getService(String serviceName) {
         return services.get(serviceName);
     }
     
     /**
-     * Get service params from user input
+     * Get service params from user input.
+     * Iterates through required parameters, showing current values (if any),
+     * and prompting the user for new values.
      * 
-     * @param serviceName
-     * @param serviceParams 
+     * @param serviceName The name of the service being configured.
+     * @param serviceParams An array of parameter names required for the service.
      */
     protected void getServiceParams(String serviceName, String[] serviceParams){
         String inputString;
@@ -81,8 +93,8 @@ public abstract class AServiceConfigHandler {
     }
 
     /**
-     * Read encrypted storage configuration yaml
-     *
+     * Read encrypted storage configuration yaml.
+     * Decrypts the configuration file and parses the YAML content into the services map.
      */
     public void readStorageConfig() {
         services = new HashMap<>();
@@ -107,7 +119,8 @@ public abstract class AServiceConfigHandler {
     }
 
     /**
-     * Create storage configuration yaml and write encrypted bytes
+     * Create storage configuration yaml and write encrypted bytes.
+     * Serializes the services map to YAML, encrypts it, and writes it to the configuration file.
      */
     public void writeStorageConfig() {
         try {
